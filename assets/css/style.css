@@ -1,0 +1,18 @@
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+h5 {
+    font-size: 3vh
+}
+
+h6 {
+    font-size: 1.75vh;
+}
+
+ul {
+    list-style: none;
+    line-height: 6vh;
+}
