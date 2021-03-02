@@ -1,11 +1,11 @@
-* {
+◘* {
     box-sizing: border-box;
     padding: 0;
     margin: 0;
 }
 
 h5 {
-    font-size: 3vh
+    font-size: 15.5px;
 }
 
 h6 {
@@ -15,4 +15,8 @@ h6 {
 ul {
     list-style: none;
     line-height: 6vh;
+}
+
+.hide {
+    visibility: hidden;
 }
