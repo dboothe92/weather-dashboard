@@ -71,6 +71,18 @@ function dataFiller(cityNameEl) {
                 .then(function(uvResponse) {
                     let uvi = uvResponse.current.uvi;
                     uvIndex.textContent = uvi;
+                    
+                    if (uvi < 3) {
+                       uvIndex.style.backgroundColor = "#00FF00"; 
+                    } else if (uvi > 3 && uvi <= 5) {
+                        uvIndex.style.backgroundColor = "#FFFF00"; 
+                    } else if (uvi > 5 && uvi <=7) {
+                        uvIndex.style.backgroundColor = "#FFA500"; 
+                    } else if (uvi > 7 && uvi <= 10) {
+                        uvIndex.style.backgroundColor = "#FF0000";
+                    } else {
+                        uvIndex.style.backgroundColor = "#8F00FF";
+                    };
                 });
         
                 //have daily info show on screen
