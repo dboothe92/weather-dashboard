@@ -14,9 +14,17 @@ let citiesHistory = []
 function searchButton(event) {
     event.preventDefault();
 
-    //Gets user input
-    let cityNameEl = document.querySelector("#searchInput").value
+    //resets history buttons
+    resetHistory();
 
+    //Gets user input
+    let cityNameEl = document.querySelector("#searchInput").value;
+
+    //fills data
+    dataFiller(cityNameEl);
+};
+
+function dataFiller(cityNameEl) {
     //getting daily info from weather api
     fetch('https://api.openweathermap.org/data/2.5/weather?q='
     + cityNameEl +
@@ -25,18 +33,25 @@ function searchButton(event) {
         if (dayResponse.ok) {
             dayResponse.json()
             .then(function(dayResponse) {
+
+                //adds search history to saveable array
+                if (citiesHistory.includes(cityNameEl)) {
+                    historyContainer();
+                } else {
+                    citiesHistory.push(cityNameEl);
+                    console.log(citiesHistory);
+                };
+
+                //saves history
+                saveHistory();
+
+                historyContainer();
+
                 //Info for detail header
                 let cityDetailsEl = document.querySelector("#cityDetails");
                 cityDetailsEl.removeAttribute("class", ".hide");
+
                 let timeOnClick = dayjs().format("M/D/YYYY");
-
-                citiesHistory.push(cityNameEl);
-                console.log(citiesHistory);
-
-                saveHistory();
-
-                //resets history buttons
-                resetHistory();
 
                 let currentTemp = Math.round(dayResponse.main.temp) + " °F";
                 let currentHumidity = dayResponse.main.humidity + "%";
@@ -47,7 +62,7 @@ function searchButton(event) {
                 let lon = dayResponse.coord.lon;
         
                 cityHeaderEl.innerHTML = (cityNameEl + " " + timeOnClick + " " + ("<img src=http://openweathermap.org/img/wn/" + singleWeatherIcon + "@2x.png>")); 
-        
+
                 //getting uvi
                 fetch('https://api.openweathermap.org/data/2.5/onecall?lat='+ lat + '&lon=' + lon + '&exclude=daily,hourly,minutely&appid=80b6d305e4d5ca9652f4c79da036c1a3&units=imperial')
                 .then(function(uvResponse) {
@@ -62,15 +77,6 @@ function searchButton(event) {
                 tempEl.textContent = currentTemp;
                 humidityEl.textContent = currentHumidity;
                 windEl.textContent = currentWindSpeed;
-
-                //log search term into history
-                for (i = 0; i < citiesHistory.length; i++) {
-                    let searchHistory = document.createElement("li");
-                    searchHistory.setAttribute("class","list-group-item");
-                    searchHistory.innerHTML = "<button  type=submit class = list-group-item>" + citiesHistory[i] + "</button>"
-            
-                    historyHolderEl.appendChild(searchHistory);
-                };
             });
         
             //getting 5 day forecast
@@ -145,10 +151,11 @@ function searchButton(event) {
             });
         } else {
             alert("Error: " + dayResponse.status);
+            loadHistory()
             return;
         };
     })
-};
+}
 
 //Function to reset History Buttons
 function resetHistory() {
@@ -167,6 +174,46 @@ function resetForecast() {
 
 function saveHistory() {
     localStorage.setItem("History", JSON.stringify(citiesHistory));
-}
+};
 
+function loadHistory() {
+    let tempArr = JSON.parse(localStorage.getItem("History"));
+
+    if (!tempArr) {
+        citiesHistory = [];
+    } else {
+        citiesHistory = tempArr;
+    }
+
+    for (i = 0; i < citiesHistory.length; i++) {
+        let searchHistory = document.createElement("li");
+        searchHistory.setAttribute("class","list-group-item");
+        searchHistory.innerHTML = "<button type = 'submit' class = 'list-group-item cardHistory'>" + citiesHistory[i] + "</button>"
+
+        searchHistory.addEventListener("click", function() {
+            dataFiller(this.textContent);
+        });
+
+        historyHolderEl.appendChild(searchHistory);
+    };
+};
+
+function historyContainer() {
+    resetHistory();
+    //log search term into history array
+    for (i = 0; i < citiesHistory.length; i++) {
+        let searchHistory = document.createElement("li");
+        searchHistory.setAttribute("class","list-group-item p-0");
+        searchHistory.innerHTML = "<button type = 'submit' id = 'historyButton" + i +  "'class = 'list-group-item cardHistory'>" + citiesHistory[i] + "</button>"
+
+        searchHistory.addEventListener("click", function() {
+            dataFiller(this.textContent);
+        }); 
+
+        historyHolderEl.appendChild(searchHistory);
+    };
+};
+
+loadHistory();
+ 
 searchButtonEl.addEventListener("click", searchButton);
